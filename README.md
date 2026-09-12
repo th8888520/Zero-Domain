@@ -1,6 +1,5 @@
-# 零域（Zero Domain）
+# 零域（Zero Domain）--大模型安全网关 
 
-**大模型安全网关** 。
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Tests: 171](https://img.shields.io/badge/Tests-171%20passing-brightgreen)](https://github.com)
