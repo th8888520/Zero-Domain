@@ -1,0 +1,400 @@
+<!doctype html>
+<html lang="zh-CN" data-theme="dark">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>零域安全网关控制台</title>
+<link rel="stylesheet" href="/admin/static/admin.css">
+
+</head>
+<body>
+<div class="cyber-shell">
+  <!-- 侧边栏 -->
+  <aside class="cyber-sidebar">
+    <div class="cyber-logo">
+      <div class="cyber-brand">Zero Domain · 零域</div>
+      <div class="cyber-subtitle">大模型安全网关</div>
+    </div>
+
+    <nav class="cyber-nav">
+      <a class="cyber-nav-item active" data-view="dashboard">
+        <svg class="cyber-nav-icon" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+          <rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/>
+          <rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/>
+        </svg>
+        <span class="cyber-nav-label">仪表盘</span>
+      </a>
+
+      <a class="cyber-nav-item" data-view="logs">
+        <svg class="cyber-nav-icon" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+          <path d="M4 6h16M4 12h16M4 18h16"/>
+        </svg>
+        <span class="cyber-nav-label">审计日志</span>
+        <span class="cyber-nav-badge" id="blocked-count">0</span>
+      </a>
+
+      <a class="cyber-nav-item" data-view="config">
+        <svg class="cyber-nav-icon" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+          <circle cx="12" cy="12" r="3"/><path d="M12 1v6m0 6v6M1 12h6m6 0h6"/>
+        </svg>
+        <span class="cyber-nav-label">配置管理</span>
+      </a>
+
+      <a class="cyber-nav-item" data-view="stats">
+        <svg class="cyber-nav-icon" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+          <line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/>
+          <line x1="6" y1="20" x2="6" y2="14"/>
+        </svg>
+        <span class="cyber-nav-label">数据分析</span>
+      </a>
+    </nav>
+
+    <div class="cyber-footer">
+      <div class="cyber-status">
+        <div class="cyber-pulse"></div>
+        <div class="cyber-status-text" id="status-text">等待连接</div>
+      </div>
+    </div>
+  </aside>
+
+  <!-- 主内容 -->
+  <main class="cyber-main">
+    <!-- 顶部栏 -->
+    <header class="cyber-header">
+      <h1 class="cyber-title glitch-effect">晚风候真心，温柔皆予你。</h1>
+      <div class="cyber-actions">
+        <div class="cyber-token-input" id="token-container" style="display:flex;">
+          <svg class="cyber-token-icon" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/>
+            <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+          </svg>
+          <input type="text" class="cyber-input-field" placeholder="输入管理员令牌..." id="token-input">
+          <button class="cyber-token-btn" id="token-submit">连接</button>
+        </div>
+        <div class="cyber-search" style="display:none;" id="search-container">
+          <svg class="cyber-search-icon" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/>
+          </svg>
+          <input type="text" class="cyber-search-input" placeholder="搜索日志..." id="search-input">
+        </div>
+        <div class="cyber-clock">
+          <div class="cyber-time" id="clock-time">--:--:--</div>
+          <div class="cyber-date" id="clock-date">---- -- --</div>
+        </div>
+      </div>
+    </header>
+
+    <!-- 内容区 -->
+    <div class="cyber-content">
+      <!-- Dashboard 视图 -->
+      <div id="view-dashboard" class="view active animate-in">
+        <!-- 统计卡片 -->
+        <div class="cyber-stats">
+          <div class="cyber-stat-card">
+            <div class="cyber-stat-header">
+              <span class="cyber-stat-label">总请求数</span>
+              <div class="cyber-stat-icon">
+                <svg width="16" height="16" fill="white" viewBox="0 0 24 24">
+                  <polyline points="22 12 18 12 15 21 9 3 6 12 2 12" stroke="white" stroke-width="2" fill="none"/>
+                </svg>
+              </div>
+            </div>
+            <div class="cyber-stat-value" id="total-requests">--</div>
+            <div class="cyber-stat-trend" id="total-trend">--</div>
+          </div>
+
+          <div class="cyber-stat-card">
+            <div class="cyber-stat-header">
+              <span class="cyber-stat-label">已放行</span>
+              <div class="cyber-stat-icon">
+                <svg width="16" height="16" fill="white" viewBox="0 0 24 24">
+                  <polyline points="20 6 9 17 4 12" stroke="white" stroke-width="2" fill="none"/>
+                </svg>
+              </div>
+            </div>
+            <div class="cyber-stat-value" id="allow-count">--</div>
+            <div class="cyber-stat-trend" id="allow-rate">-- %</div>
+          </div>
+
+          <div class="cyber-stat-card">
+            <div class="cyber-stat-header">
+              <span class="cyber-stat-label">已拦截</span>
+              <div class="cyber-stat-icon">
+                <svg width="16" height="16" fill="white" viewBox="0 0 24 24">
+                  <circle cx="12" cy="12" r="10" stroke="white" stroke-width="2" fill="none"/>
+                  <line x1="15" y1="9" x2="9" y2="15" stroke="white" stroke-width="2"/>
+                </svg>
+              </div>
+            </div>
+            <div class="cyber-stat-value" id="block-count">--</div>
+            <div class="cyber-stat-trend" id="block-rate">-- %</div>
+          </div>
+
+          <div class="cyber-stat-card">
+            <div class="cyber-stat-header">
+              <span class="cyber-stat-label">平均响应</span>
+              <div class="cyber-stat-icon">
+                <svg width="16" height="16" fill="white" viewBox="0 0 24 24">
+                  <circle cx="12" cy="12" r="10" stroke="white" stroke-width="2" fill="none"/>
+                  <polyline points="12 6 12 12 16 14" stroke="white" stroke-width="2" fill="none"/>
+                </svg>
+              </div>
+            </div>
+            <div class="cyber-stat-value" id="avg-response">--</div>
+            <div class="cyber-stat-trend">毫秒</div>
+          </div>
+        </div>
+
+        <!-- 数据表格 -->
+        <div class="cyber-table-container">
+          <div class="cyber-table-header">
+            <h2 class="cyber-table-title">最近拦截</h2>
+            <div class="cyber-table-actions">
+              <button class="cyber-btn" id="refresh-btn">刷新</button>
+              <button class="cyber-btn-primary cyber-btn" id="view-all-btn">查看全部</button>
+            </div>
+          </div>
+          <div class="cyber-table-wrapper">
+            <table class="cyber-table">
+              <thead>
+                <tr>
+                  <th>时间</th>
+                  <th>方法</th>
+                  <th class="col-path">路径</th>
+                  <th>判定</th>
+                  <th>状态</th>
+                  <th class="col-reason">拦截原因</th>
+                  <th>耗时</th>
+                </tr>
+              </thead>
+              <tbody id="log-body">
+                <tr>
+                  <td colspan="7" style="text-align:center;padding:60px;color:var(--text-tertiary);">
+                    等待连接...
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <div class="cyber-pagination" id="pagination">
+            <button class="cyber-page-btn" id="page-first" disabled>« 首页</button>
+            <button class="cyber-page-btn" id="page-prev" disabled>‹ 上一页</button>
+            <span class="cyber-page-info" id="page-info">第 1 页 / 共 1 页</span>
+            <button class="cyber-page-btn" id="page-next" disabled>下一页 ›</button>
+            <button class="cyber-page-btn" id="page-last" disabled>末页 »</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- 审计日志视图 -->
+      <div id="view-logs" class="view" style="display:none;">
+        <div class="cyber-table-container">
+          <div class="cyber-table-header">
+            <h2 class="cyber-table-title">完整审计日志</h2>
+            <div class="cyber-table-actions">
+              <button class="cyber-btn" id="logs-refresh-btn">刷新</button>
+              <button class="cyber-btn" id="logs-clear-btn">清空显示</button>
+            </div>
+          </div>
+          <div class="cyber-table-wrapper">
+            <table class="cyber-table">
+              <thead>
+                <tr>
+                  <th>时间</th>
+                  <th>方法</th>
+                  <th class="col-path">路径</th>
+                  <th>判定</th>
+                  <th>上游状态</th>
+                  <th>耗时</th>
+                  <th class="col-reason">原因</th>
+                </tr>
+              </thead>
+              <tbody id="logs-table-body">
+                <tr>
+                  <td colspan="7" style="text-align:center;padding:60px;color:var(--text-tertiary);">
+                    等待连接后加载审计日志...
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <div class="cyber-pagination" id="logs-pagination">
+            <button class="cyber-page-btn" id="logs-page-first">« 首页</button>
+            <button class="cyber-page-btn" id="logs-page-prev">‹ 上一页</button>
+            <span class="cyber-page-info" id="logs-page-info">第 1 页 / 共 1 页</span>
+            <button class="cyber-page-btn" id="logs-page-next">下一页 ›</button>
+            <button class="cyber-page-btn" id="logs-page-last">末页 »</button>
+            <button class="cyber-btn" id="logs-load-more-btn" type="button">加载更多</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- 配置管理视图 -->
+      <div id="view-config" class="view" style="display:none;">
+        <div class="cyber-stats" style="margin-bottom:24px;">
+          <div class="cyber-stat-card">
+            <div class="cyber-stat-header">
+              <span class="cyber-stat-label">代理模式</span>
+            </div>
+            <div class="cyber-stat-value" style="font-size:24px;" id="config-mode">--</div>
+            <div class="cyber-stat-trend">PROXY_AUTH_PASSTHROUGH</div>
+          </div>
+          <div class="cyber-stat-card">
+            <div class="cyber-stat-header">
+              <span class="cyber-stat-label">审查模式</span>
+            </div>
+            <div class="cyber-stat-value" style="font-size:24px;" id="config-review">--</div>
+            <div class="cyber-stat-trend">REVIEW_MODE · llm=开 / off=关</div>
+          </div>
+          <div class="cyber-stat-card">
+            <div class="cyber-stat-header">
+              <span class="cyber-stat-label">上游地址</span>
+            </div>
+            <div class="cyber-stat-value" style="font-size:16px;word-break:break-all;" id="config-upstream">--</div>
+            <div class="cyber-stat-trend" id="config-upstream-trend">实时上游</div>
+          </div>
+          <div class="cyber-stat-card">
+            <div class="cyber-stat-header">
+              <span class="cyber-stat-label">审计日志</span>
+            </div>
+            <div class="cyber-stat-value" style="font-size:16px;word-break:break-all;" id="config-audit-path">--</div>
+            <div class="cyber-stat-trend">AUDIT_PATH</div>
+          </div>
+        </div>
+        <div class="cyber-table-container">
+          <div class="cyber-table-header">
+            <h2 class="cyber-table-title">环境配置</h2>
+            <div class="cyber-table-actions">
+              <button class="cyber-btn" id="config-refresh-btn">刷新</button>
+            </div>
+          </div>
+          <div id="secrets-reminder" style="display:none;margin:0 16px 12px;padding:10px 12px;border:1px solid var(--cyber-yellow);border-radius:4px;background:rgba(255,200,0,0.08);color:var(--cyber-yellow);font-size:12px;line-height:1.6;"></div>
+          <div class="config-grid" id="config-detail-grid">
+            <div class="config-item"><div class="config-item-label">监听地址</div><div class="config-item-value" id="config-listen">--</div></div>
+            <div class="config-item"><div class="config-item-label">上游来源</div><div class="config-item-value" id="config-upstream-source">--</div></div>
+            <div class="config-item"><div class="config-item-label">实时上游</div><div class="config-item-value" id="config-upstream-live">--</div></div>
+            <div class="config-item"><div class="config-item-label">回退上游</div><div class="config-item-value" id="config-upstream-fallback">--</div></div>
+            <div class="config-item"><div class="config-item-label">审查范围</div><div class="config-item-value" id="config-scope">--</div></div>
+            <div class="config-item"><div class="config-item-label">审查提供商</div><div class="config-item-value" id="config-provider">--</div></div>
+            <div class="config-item"><div class="config-item-label">审查模型</div><div class="config-item-value" id="config-model">--</div></div>
+            <div class="config-item"><div class="config-item-label">审查地址</div><div class="config-item-value" id="config-judge-base">--</div></div>
+            <div class="config-item"><div class="config-item-label">审查 Key</div><div class="config-item-value" id="config-review-key">--</div></div>
+            <div class="config-item"><div class="config-item-label">超时设置</div><div class="config-item-value" id="config-timeout">--</div></div>
+            <div class="config-item"><div class="config-item-label">最大并发</div><div class="config-item-value" id="config-concurrent">--</div></div>
+            <div class="config-item"><div class="config-item-label">审查间隔</div><div class="config-item-value" id="config-interval">--</div></div>
+            <div class="config-item"><div class="config-item-label">队列大小</div><div class="config-item-value" id="config-queue">--</div></div>
+            <div class="config-item"><div class="config-item-label">审查故障策略</div><div class="config-item-value" id="config-fail-open" title="REVIEW_FAIL_OPEN：模型超时/挂掉时拦截或放行">--</div></div>
+            <div class="config-item"><div class="config-item-label">拦截后断连</div><div class="config-item-value" id="config-disconnect">--</div></div>
+            <div class="config-item"><div class="config-item-label">审计请求体</div><div class="config-item-value" id="config-audit-body">--</div></div>
+            <div class="config-item"><div class="config-item-label">终端审计输出</div><div class="config-item-value" id="config-audit-stdout">--</div></div>
+            <div class="config-item"><div class="config-item-label">上游认证模式</div><div class="config-item-value" id="config-upstream-auth">--</div></div>
+          </div>
+        </div>
+
+        <!-- .env 在线编辑器 -->
+        <div class="cyber-table-container" style="margin-top:20px;">
+          <div class="cyber-table-header">
+            <h2 class="cyber-table-title">.env 环境配置文件</h2>
+            <div class="cyber-table-actions">
+              <button class="cyber-btn" id="env-reload-btn">重新加载</button>
+              <button class="cyber-btn cyber-btn-primary" id="env-save-btn">保存</button>
+            </div>
+          </div>
+          <div style="padding:12px 16px 0;">
+            <div id="env-status" style="font-size:12px;color:var(--text-tertiary);margin-bottom:8px;">加载中...</div>
+            <div id="env-override-warning" style="display:none;font-size:12px;color:var(--cyber-yellow);margin-bottom:8px;"></div>
+            <textarea id="env-editor" spellcheck="false" style="width:100%;min-height:320px;background:var(--bg-dark);color:var(--text-primary);border:1px solid var(--border-normal);border-radius:4px;padding:12px;font-family:var(--font-mono);font-size:12px;line-height:1.6;resize:vertical;white-space:pre;tab-size:4;"></textarea>
+            <div style="font-size:11px;color:var(--text-tertiary);margin-top:8px;line-height:1.6;">
+              提示：保存前自动备份为 <code>.env.zero-domain-backup</code>；配置在启动时加载，<span style="color:var(--cyber-yellow);">保存后需重启代理生效</span>；语法：每行 <code>KEY=VALUE</code>、<code>#</code> 注释或空行。
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 数据分析视图 -->
+      <div id="view-stats" class="view" style="display:none;">
+        <div class="cyber-stats" style="margin-bottom:24px;">
+          <div class="cyber-stat-card">
+            <div class="cyber-stat-header">
+              <span class="cyber-stat-label">放行请求</span>
+              <div class="cyber-stat-icon" style="background: linear-gradient(135deg, #00e5ff, #00b8d4);">
+                <svg width="16" height="16" fill="white" viewBox="0 0 24 24">
+                  <polyline points="20 6 9 17 4 12" stroke="white" stroke-width="2" fill="none"/>
+                </svg>
+              </div>
+            </div>
+            <div class="cyber-stat-value" style="background: linear-gradient(135deg, #00e5ff, #00b8d4);-webkit-background-clip:text;-webkit-text-fill-color:transparent;" id="stats-allow-count">0</div>
+            <div class="cyber-stat-trend" id="stats-allow-percent">0%</div>
+          </div>
+
+          <div class="cyber-stat-card">
+            <div class="cyber-stat-header">
+              <span class="cyber-stat-label">拦截请求</span>
+              <div class="cyber-stat-icon">
+                <svg width="16" height="16" fill="white" viewBox="0 0 24 24">
+                  <circle cx="12" cy="12" r="10" stroke="white" stroke-width="2" fill="none"/>
+                  <line x1="15" y1="9" x2="9" y2="15" stroke="white" stroke-width="2"/>
+                </svg>
+              </div>
+            </div>
+            <div class="cyber-stat-value" id="stats-block-count">0</div>
+            <div class="cyber-stat-trend" id="stats-block-percent">0%</div>
+          </div>
+
+          <div class="cyber-stat-card">
+            <div class="cyber-stat-header">
+              <span class="cyber-stat-label">跳过审查</span>
+              <div class="cyber-stat-icon" style="background: linear-gradient(135deg, #9e9e9e, #757575);">
+                <svg width="16" height="16" fill="white" viewBox="0 0 24 24">
+                  <path d="M13 5l7 7-7 7M5 5l7 7-7 7" stroke="white" stroke-width="2" fill="none"/>
+                </svg>
+              </div>
+            </div>
+            <div class="cyber-stat-value" style="background: linear-gradient(135deg, #9e9e9e, #757575);-webkit-background-clip:text;-webkit-text-fill-color:transparent;" id="stats-skip-count">0</div>
+            <div class="cyber-stat-trend" id="stats-skip-percent">0%</div>
+          </div>
+        </div>
+
+        <div class="cyber-table-container">
+          <div class="cyber-table-header">
+            <h2 class="cyber-table-title">时段活动统计</h2>
+          </div>
+          <table class="cyber-table">
+            <thead>
+              <tr>
+                <th>时段</th>
+                <th>请求数</th>
+                <th>放行</th>
+                <th>拦截</th>
+                <th>放行率</th>
+                <th>平均耗时</th>
+              </tr>
+            </thead>
+            <tbody id="stats-activity-body">
+              <tr>
+                <td colspan="6" style="text-align:center;padding:40px;color:var(--text-tertiary);">
+                  统计数据生成中...
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </main>
+</div>
+
+<div class="cyber-modal-overlay" id="log-detail-modal">
+  <div class="cyber-modal" role="dialog" aria-modal="true">
+    <div class="cyber-modal-header">
+      <div class="cyber-modal-title">拦截详情</div>
+      <button class="cyber-modal-close" id="log-detail-close" type="button">关闭</button>
+    </div>
+    <div class="cyber-modal-body" id="log-detail-body"></div>
+  </div>
+</div>
+
+<script src="/admin/static/admin.js"></script>
+
+</body>
+</html>

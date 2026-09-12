@@ -1,0 +1,38 @@
+# 依赖
+node_modules/
+
+# 环境变量和敏感配置
+.env
+*.env.local
+
+# 运行时数据
+data/
+*.audit.jsonl
+*.audit.jsonl.*
+logs/
+
+# 备份和临时文件
+*.backup
+*.lock
+*.conflict-original
+*.tmp-*
+*.swp
+*~
+
+# IDE 和编辑器
+.vscode/
+.idea/
+*.iml
+.DS_Store
+
+# Claude Code 相关
+.claude/
+.omc/
+
+# 测试和验证
+verification/
+coverage/
+
+# 系统文件
+/nul
+Thumbs.db
