@@ -8,49 +8,6 @@
 包名：`zero-domain`　运行时：Bun ≥ 1.0　语言：TypeScript
 
 ---
-
-## 最新更新
-
-**v2.4 硬拦扩展与密钥轮换提醒（2026-09-12）**
-
-- ✅ **硬拦扩展**：`rm -rf /tmp`、PowerShell `Remove-Item -Recurse -Force`、关机/磁盘/下载执行、`rd /s /q`
-- ✅ **绕过加固**：NFKC + 去零宽 / BIDI 控制符 + 西里尔同形字归一化后再匹配
-- ✅ **密钥轮换提醒**：配置页展示「审查 Key 已配置 ···末四位」与黄色提醒条；`*.secrets-meta.json` 记录轮换时间（≥30 天建议更换）
-- ✅ **管理可写审查 Key**：`REVIEW_API_KEY` / `REVIEW_BASE_URL` 可经配置 API 轮换（GET 仍不回传原文）
-
-**v2.3 复审中高危修复（2026-09-12）**
-
-- ✅ **ccswitch 禁混绑**：settings 只有外部 URL、无自带 Key 时整包回退 static，禁止把本地 `UPSTREAM_API_KEY` 打到任意上游
-- ✅ **硬拦收紧**：立刻执行意图不再被「如何」豁免；工具参数/编码解码永不讨论豁免；窗口外摘要无豁免；投影补 `prompt`
-- ✅ **编码 decoy**：硬拦「解码即检」、尾部优先、仅成功解码计入预算；覆盖 500 decoy / 50KB 前缀
-- ✅ **PEM**：覆盖 `ENCRYPTED` / `DSA` 等 `* PRIVATE KEY`
-- ✅ **env-file**：拒绝把 GET 脱敏的 `***` 写回密钥；UI 提示勿原样保存
-
-**v2.2 管理端拆分与历史分页（2026-09-12）**
-
-- ✅ **静态资源拆分**：管理页拆到 `src/admin/static/`；审计「加载更多」；读写串行；统计/拦截列表纠正
-
-**v2.2 中高危审计项全部修复（2026-09-12）**
-
-- ✅ **空密钥旁路**：空/未配置代理密钥一律 401；管理 API / env-file 禁止写入空 `PROXY_*` / `*_TOKEN`
-- ✅ **认证 timing-safe**：代理与管理鉴权改 `crypto.timingSafeEqual`
-- ✅ **env-file 对齐白名单**：拒绝 `LISTEN_HOST` / `*_PATH` 等危险键；GET 对 KEY/TOKEN 脱敏
-- ✅ **审查漏面**：全量 messages + `tool_use`/`function_call` 硬拦；讨论词仅邻近豁免、不跨消息短路；窗口外摘要 `omittedDestructiveHints`
-- ✅ **PEM 整块脱敏**、**透传模式不注入上游 Key**、上游/审查 `redirect: "manual"`
-- ✅ **BAT/TS 备份后缀统一**为 `.zero-domain.backup`（兼容迁移旧名）；停止先优雅再强杀
-- ✅ **映射表/配置写锁上限**：单请求占位符上限 + 活跃映射淘汰；config-store 按路径串行写
-
-**v2.1 管理后台拦截详情（2026-09-12）**
-
-- ✅ **修复「连接」无反应**：管理页脚本模板字符串 `\n` 被提前展开导致 JS 解析失败
-- ✅ **拦截原文可查看**：列表默认不带 body，详情按 `id` 按需拉取；需 `AUDIT_INCLUDE_BODY=blocked` 或 `all`
-- ✅ **被拦截部分标记**：红色区块 / `BLOCKED` 徽章，尽量高亮与原因/「摘录」相关的原文
-- ✅ **智能预览窗口**：优先最近 `messages`，超长按原因锚点截取约 4000 字符
-- ✅ **上游显示跟 CCS**：配置页展示实时解析上游 + `.env` 回退值
-- ✅ **正确性/性能加固**：JSON 多字段脱敏映射合并；配置 PUT 合并写入；审计 DELETE 入队；`upstream.ts` 短缓存；bat 读 `LISTEN_PORT`
-
-**v2.0 安全加固版（2026-09-11）** - 完整修复 5 个安全审计发现
-
 ### 测试覆盖
 **171 pass / 0 fail**（含安全加固回归、管理分页、上游解析、脱敏合并、端到端集成）
 
