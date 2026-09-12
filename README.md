@@ -1,6 +1,6 @@
 # 零域（Zero Domain）
 
-**本机 AI 安全网关** — 夹在 Claude Code / Codex CLI 与上游 API 之间，做脱敏、审查与审计。
+**大模型安全网关** 。
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Tests: 171](https://img.shields.io/badge/Tests-171%20passing-brightgreen)](https://github.com)
