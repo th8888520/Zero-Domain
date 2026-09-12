@@ -14,6 +14,7 @@ logs/
 # 备份和临时文件
 *.backup
 *.lock
+!bun.lock
 *.conflict-original
 *.tmp-*
 *.swp
